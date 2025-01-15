@@ -16,7 +16,7 @@ use bevy::{
     ecs::{
         intern::Interned,
         schedule::{ExecutorKind, LogLevel, ScheduleBuildSettings, ScheduleLabel},
-        system::SystemParam,
+        system::{StaticSystemParam, SystemParam},
     },
     prelude::*,
 };
@@ -384,6 +384,7 @@ pub struct NarrowPhase<'w, 's, C: AnyCollider> {
     // These are scaled by the length unit.
     default_speculative_margin: Local<'s, Scalar>,
     contact_tolerance: Local<'s, Scalar>,
+    context: StaticSystemParam<'w, 's, <C as AnyCollider>::Context>,
 }
 
 impl<C: AnyCollider> NarrowPhase<'_, '_, C> {
@@ -569,7 +570,10 @@ impl<C: AnyCollider> NarrowPhase<'_, '_, C> {
             *collider1.rotation,
             position2,
             *collider2.rotation,
+            collider1.entity,
+            collider2.entity,
             max_distance,
+            &self.context,
         );
 
         // Get the previous contacts if there are any.

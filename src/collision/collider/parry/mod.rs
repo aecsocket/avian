@@ -3,7 +3,7 @@
 use crate::{make_isometry, prelude::*};
 #[cfg(feature = "collider-from-mesh")]
 use bevy::render::mesh::{Indices, VertexAttributeValues};
-use bevy::{log, prelude::*};
+use bevy::{ecs::system::SystemParamItem, log, prelude::*};
 use collision::contact_query::UnsupportedShape;
 use itertools::Either;
 use parry::shape::{RoundShape, SharedShape, TypedShape};
@@ -385,6 +385,8 @@ impl Default for Collider {
 }
 
 impl AnyCollider for Collider {
+    type Context = ();
+
     fn aabb(&self, position: Vector, rotation: impl Into<Rotation>) -> ColliderAabb {
         let aabb = self
             .shape_scaled()
@@ -402,7 +404,10 @@ impl AnyCollider for Collider {
         rotation1: impl Into<Rotation>,
         position2: Vector,
         rotation2: impl Into<Rotation>,
+        _entity1: Entity,
+        _entity2: Entity,
         prediction_distance: Scalar,
+        _context: &SystemParamItem<'_, '_, Self::Context>,
     ) -> Vec<ContactManifold> {
         contact_query::contact_manifolds(
             self,

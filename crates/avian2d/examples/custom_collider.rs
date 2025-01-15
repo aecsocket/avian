@@ -3,7 +3,7 @@
 #![allow(clippy::unnecessary_cast)]
 
 use avian2d::{math::*, prelude::*};
-use bevy::prelude::*;
+use bevy::{ecs::system::SystemParamItem, prelude::*};
 use examples_common_2d::ExampleCommonPlugin;
 
 fn main() {
@@ -53,6 +53,8 @@ impl CircleCollider {
 }
 
 impl AnyCollider for CircleCollider {
+    type Context = ();
+
     fn aabb(&self, position: Vector, _rotation: impl Into<Rotation>) -> ColliderAabb {
         ColliderAabb::new(position, Vector::splat(self.radius))
     }
@@ -66,7 +68,10 @@ impl AnyCollider for CircleCollider {
         rotation1: impl Into<Rotation>,
         position2: Vector,
         rotation2: impl Into<Rotation>,
+        _entity1: Entity,
+        _entity2: Entity,
         prediction_distance: Scalar,
+        _context: &SystemParamItem<'_, '_, Self::Context>,
     ) -> Vec<ContactManifold> {
         let rotation1: Rotation = rotation1.into();
         let rotation2: Rotation = rotation2.into();
